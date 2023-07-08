@@ -1,4 +1,5 @@
 import adminRepository from "../repositories/adminRepository.js";
+import auth from "../middleware/auth.js";
 
 class AdminController {
 
@@ -24,6 +25,33 @@ class AdminController {
         .then((list)=>
         {
             response.status(200).json(list)
+        }).catch((e)=>{
+            response.status(400).json(e)
+        })
+
+    }//pega por id
+
+    async getUserByEmailAndPassword(request, response) 
+    {
+        const {email, password} = request.body;
+        if (!email || !password) 
+        {
+            response.status(404).send('Admin bad formatted')
+            return
+        }
+
+        await adminRepository.findByEmailAndPassword(email, password)
+        .then((user)=>
+        {   
+            if(user.length === 0)
+            {
+                return response.status(400).json({message: "User not found"})
+            }else{
+                const token = auth.generateToken(email)
+                token['user'] = user
+                response.status(200).json(token)
+            }
+
         }).catch((e)=>{
             response.status(400).json(e)
         })

@@ -43,6 +43,18 @@ class AdminRepository {
             })
         })
     }
+
+    findByEmailAndPassword(email, password) {
+        const sql = "SELECT * FROM admin WHERE email=? AND password =?;";
+        return new Promise((resolve, reject) => {
+            conexao.query(sql, [email, password], (error, result) => {
+                if (error) {
+                    return reject(error)
+                }
+                return resolve(result)
+            })
+        })
+    }
     
     update(id, admin) {
         const sql = "UPDATE admin SET ? WHERE id=?;";
